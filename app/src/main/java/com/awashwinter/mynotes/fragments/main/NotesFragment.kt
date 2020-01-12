@@ -8,6 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DiffUtil
 import com.awashwinter.mynotes.R
 import com.awashwinter.mynotes.adapters.MainAdapter
@@ -21,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_notes.*
 class NotesFragment : Fragment() {
 
     private lateinit var notesViewModel: NotesMainViewModel
+    private lateinit var passDataViewModel: PassDataViewModel
 
     private lateinit var adapter: MainAdapter
 
@@ -35,7 +40,13 @@ class NotesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel = ViewModelProviders.of(this).get(NotesMainViewModel::class.java)
-        adapter = MainAdapter()
+        passDataViewModel = ViewModelProviders.of(activity!!).get(PassDataViewModel::class.java)
+        adapter = MainAdapter(clickListener = {myNote, i ->
+            run {
+                passDataViewModel.shareNote(myNote)
+                navigateToEdit(true)
+            }
+        })
     }
 
 
@@ -43,11 +54,18 @@ class NotesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         rvNotes.adapter = adapter
         fabAdd.setOnClickListener {
-            notesViewModel.addNote("test wre")
+            //notesViewModel.addNote("test wre")
+            navigateToEdit(false)
         }
         notesViewModel.getNotes()?.observe(viewLifecycleOwner, Observer {
             applyChanges(it)
         })
+    }
+
+    private fun navigateToEdit(edit: Boolean){
+        var bundle: Bundle = Bundle()
+        bundle.putBoolean("editMode",edit)
+        NavHostFragment.findNavController(this).navigate(R.id.action_notesFragment_to_noteEditFragment, bundle)
     }
 
     private fun applyChanges(it: List<MyNote>?) {

@@ -17,4 +17,8 @@ class UseCaseAddNote {
     fun addNote(note: MyNote){
         notesRepository.insertNote(note)
     }
+
+    fun updateNote(note: MyNote) {
+        notesRepository.updateNote(note)
+    }
 }

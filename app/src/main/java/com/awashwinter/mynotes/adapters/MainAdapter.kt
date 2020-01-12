@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainAdapter : RecyclerView.Adapter<MainAdapter.NoteViewHolder>() {
+class MainAdapter(val clickListener: (MyNote, Int) -> Unit) : RecyclerView.Adapter<MainAdapter.NoteViewHolder>() {
 
 
     fun Long.timestampToString(dateFormat: String): String {
@@ -23,10 +23,13 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.NoteViewHolder>() {
     }
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        fun bind(note: MyNote) {
+        fun bind(note: MyNote, pos: Int) {
             with(itemView) {
                 tvTextBody.text = note.noteText
                 tvTimestamp.text = note.createdAt.timestampToString("dd/MM/yyyy hh:mm:ss")
+                cardItem.setOnClickListener{
+                    clickListener(note, pos)
+                }
             }
         }
     }
@@ -39,7 +42,7 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.NoteViewHolder>() {
     override fun getItemCount() = listNotes.size
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.bind(listNotes[position])
+        holder.bind(listNotes[position], position)
     }
 
     fun setItems(newItems: ArrayList<MyNote>) {

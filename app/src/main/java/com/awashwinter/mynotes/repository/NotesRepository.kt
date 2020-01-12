@@ -37,4 +37,17 @@ class NotesRepository {
             )
     }
 
+    fun updateNote(note: MyNote){
+        mutableStateDb.value = StateDb.START
+        Completable.fromAction {
+            noteDao?.updateWithTimestamp(note)
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = {mutableStateDb.value = StateDb.ERROR},
+                onComplete = {mutableStateDb.value = StateDb.FINISH}
+            )
+    }
+
 }
